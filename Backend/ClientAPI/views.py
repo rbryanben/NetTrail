@@ -2,7 +2,7 @@ import imp
 import json
 from json.decoder import JSONDecodeError
 import os
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
@@ -24,7 +24,8 @@ def getServiceStatus(request):
                 raise KeyError
 
             # Server is configured
-            return HttpResponse("Configured",status=200)
+            return JsonResponse(configurations, safe=False,status=200)
+
     except FileNotFoundError:
         return HttpResponse("Service Not Configured",status=500)
     except JSONDecodeError:
@@ -53,7 +54,7 @@ def configureService(request):
             configFile.write(json.dumps(configurations))
 
         # Configured
-        return HttpResponse("Configured",status=200)
+        return JsonResponse(configurations,safe=False,status=200)
     except JSONDecodeError:
         return HttpResponse("Invalid Configuration",status=200)
     except FileNotFoundError:
