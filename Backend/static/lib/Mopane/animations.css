@@ -1,0 +1,26 @@
+@keyframes pop_in {
+    from {
+        filter: grayscale(1);
+    }
+    to {
+        filter: grayscale(0);
+    }
+}
+
+@keyframes insert {
+    from {
+        transform: translate(-50%, -45%);
+    }
+    to {
+        transform: translate(-50%, -50%);
+    }
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(360);
+    }
+}

@@ -1,0 +1,65 @@
+<style>
+    .dialog-wrapper {
+        width: 390px;
+        animation: insert 0.15s ease-out;
+        transform-origin: center !important;
+        display: none;
+    }
+    
+    .dialog-wrapper.show {
+        display: block;
+    }
+    
+    .dialog-wrapper .header {
+        color: var(--color-primary);
+    }
+    
+    .dialog-wrapper .body {
+        margin-top: 35px;
+    }
+    
+    .dialog-wrapper .procceed-button-wrapper {
+        margin-top: 35px;
+        margin-left: auto;
+    }
+    
+    .dialog-wrapper .procceed-button {
+        margin-left: auto;
+        background-color: var(--color-primary);
+        color: white;
+    }
+</style>
+<template id="dialog_template">
+    <div class="panel dialog-wrapper" v-bind:class="{show:isShowing || content.autoShow}">
+        <div class="tl header">[[content.header]]</div>
+        <div class="ts body">[[content.body]]</div>
+        <div class="procceed-button-wrapper div-flex end">
+            <span class="procceed-button button ts" v-on:click="accept">[[content.accept]]</span>
+        </div> 
+    </div>
+</template>
+
+<script>
+    const dialogComponent = Vue.component('dialog-component', {
+        delimiters: ['[[', ']]'],
+        template: '#dialog_template',
+        props: ['content'],
+        data: function() {
+            return {
+                isShowing: false
+            }
+        },
+        methods: {
+            accept: function() {
+                document.querySelector(".dialog-wrapper").style.visibility = "Hidden"
+                this.$emit('accepted')
+            },
+            show: function() {
+                this.isShowing = true
+            },
+            hide: function() {
+                this.isShowing = false
+            }
+        }
+    })
+</script>

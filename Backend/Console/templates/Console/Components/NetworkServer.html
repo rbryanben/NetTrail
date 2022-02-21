@@ -1,0 +1,86 @@
+<style>
+    .network-server {
+        display: grid;
+        grid-template-columns: 0.5fr 1fr 1fr 1fr 0.7fr 1fr;
+        margin-top: 5px;
+        padding: 20px 10px;
+        border-radius: 4px;
+        background-color: rgba(192, 192, 192, 0.089);
+        transition: all 0.1s ease-out;
+    }
+    
+    .network-server.editing {
+        transform: scaleX(0.98);
+    }
+    
+    .color-tag {
+        height: 10px;
+        width: 10px;
+        border-radius: 50%;
+        background-color: rgb(238, 119, 119);
+        display: flex;
+        margin-left: 5px;
+    }
+</style>
+
+<template id="network_server_component_template">
+    <div class="network-server ts" v-bind:class="{editing:isEditing}" v-bind:title="getSummary" v-on:dblclick="edit">
+        <div class="div-flex start">Color Tag: <div class="color-tag" v-bind:id="content.hostname" ></div></div>
+        <div>Hostname: [[content.hostname]]</div>
+        <div>IPv4: [[content.last_known_ip]]</div>
+        <div>Tag Name: [[content.user_defined_name]]</div>
+        <div>Log Count: [[content.log_count]]</div>
+        <div>Last Log: 2022-02-19 10:52:45</div>
+    </div>
+</template>
+
+
+<script>
+    const networkServerComponent = Vue.component('network-server', {
+        template: "#network_server_component_template",
+        delimiters: ['[[', ']]'],
+        data: function() {
+            return {
+                isEditing: false
+            }
+        },
+        props: ['content'],
+        computed: {
+            getSummary: function() {
+                return 'Hello there'
+            }
+        },
+        methods: {
+            edit: function() {
+                this.isEditing = true
+            }
+        },
+        mounted: function() {
+            var context = this
+
+            $("#" + context.content.hostname).colorPick({
+                'initialColor': context.content.color_tag,
+                'palette': ["#1abc9c", "#16a085", "#2ecc71", "#27ae60", "#3498db", "#2980b9", "#9b59b6", "#8e44ad", "#34495e", "#2c3e50", "#f1c40f", "#f39c12", "#e67e22", "#d35400", "#e74c3c", "#c0392b", "#ecf0f1"],
+                'onColorSelected': function() {
+                    //update to the server 
+                    var data = {
+                        "color": this.color,
+                        "server_id": context.content.id
+                    }
+
+                    updateToServer('/api/getServers', data, (result, status) => {
+                        if (status == 204)
+                            alert("Key Error")
+                        if (status == 404)
+                            alert("Server Not Found")
+                    })
+
+                    this.element.css({
+                        'backgroundColor': this.color,
+                        'color': this.color
+                    });
+                }
+            });
+        }
+    })
+</script>

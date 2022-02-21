@@ -1,0 +1,58 @@
+@font-face {
+    font-family: "Ubuntu-Light";
+    src: url("/static/fonts/Ubuntu-Light.ttf");
+}
+
+@font-face {
+    font-family: "Ubuntu";
+    src: url("/static/fonts/Ubuntu-Regular.ttf");
+}
+
+@font-face {
+    font-family: "Ubuntu-Bold";
+    src: url("/static/fonts/Ubuntu-Bold.ttf");
+}
+
+@font-face {
+    font-family: "Ubuntu-Italic";
+    src: url("/static/fonts/Ubuntu-Italic.ttf");
+}
+
+:root {
+    --color-primary: #2c47c4;
+    --color-primary-dark: #172666;
+    --color-primary-faded: #2c48c417;
+    --text-light: rgb(73, 73, 73);
+    --color-input-highlight: #bda745d2;
+}
+
+body {
+    font-family: 'Ubuntu', sans-serif;
+    color: rgb(65, 65, 65);
+    font-size: 1.2rem;
+    padding: 0;
+    margin: 0;
+    background-color: rgba(241, 241, 241, 0.267);
+}
+
+#Application {
+    height: 100vh;
+    width: 100vw;
+}
+
+.loading-window-wrapper {
+    height: 90%;
+    width: 100%;
+    opacity: 0;
+    visibility: 0;
+}
+
+.loading-window-wrapper>img {
+    height: 80px;
+    animation: pop_in 0.1s ease-in-out;
+}
+
+.loading-window-wrapper.show {
+    opacity: 1;
+    visibility: 1;
+}

@@ -1,0 +1,44 @@
+.window {
+    height: 100vh;
+    width: 100vw;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    position: fixed;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.window.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.panel {
+    background-color: white;
+    border-radius: 4px;
+    padding: 40px 50px;
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    transition: all 0.15s ease-out;
+    z-index: 1000;
+}
+
+.panel.show {
+    transform: translate(-50%, -50%);
+}
+
+.panel-light {
+    background-color: white;
+    border-radius: 2px;
+    padding: 40px 50px;
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2), 0 1.5px 5px 0 rgba(0, 0, 0, 0.19);
+    transition: all 0.15s ease-out;
+}

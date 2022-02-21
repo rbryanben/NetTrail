@@ -1,0 +1,20 @@
+{
+    "name": "NetTrail Logger Web Application",
+    "short_name": "NetTrail",
+    "description": "Progressive Web App that monitors network and application logs.",
+    "start_url": "/",
+    "display": "fullscreen",
+    "theme_color": "#2c47c4",
+    "background_color": "#8080803a",
+    "icons": [{
+            "src": "/static/img/icon-32.png",
+            "sizes": "32x32",
+            "type": "image/png"
+        },
+        {
+            "src": "/static/img/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

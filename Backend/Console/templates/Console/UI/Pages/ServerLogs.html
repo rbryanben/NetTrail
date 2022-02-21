@@ -1,0 +1,35 @@
+<style>
+
+</style>
+
+<template id="server_logs_template"> 
+    <span>
+        <!-- Heading -->
+        <div class="heading">
+            <div class="page">Server Logs</div>
+            <div class="subpages">
+                <span class="page ts selected">
+                    All Logs
+                </span>
+                <span class="page ts ">
+                    Grouped Logs
+                </span>
+                <span class="page ts">
+                    Server Stats
+                </span>
+            </div>
+        </div>
+
+        <router-view></router-view>
+    </span>
+</template>
+
+<script>
+    const serverLogsPage = Vue.component('server-logs-page', {
+        template: '#server_logs_template',
+        delimiters: ['[[', ']]'],
+        mounted: function() {
+
+        },
+    })
+</script>

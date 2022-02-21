@@ -1,0 +1,35 @@
+<style>
+
+</style>
+
+<template id="network_servers_template"> 
+    <span>
+        <!-- Heading -->
+        <div class="heading">
+            <div class="page">Network Servers</div>
+            <div class="subpages">
+                <span class="page ts selected">
+                    Active Servers
+                </span>
+                <span class="page ts ">
+                    Server History
+                </span>
+                <span class="page ts">
+                    Health Checks
+                </span>
+            </div>
+        </div>
+
+        <router-view></router-view>
+    </span>
+</template>
+
+<script>
+    const networkServersPage = Vue.component('network-servers-page', {
+        template: '#network_servers_template',
+        delimiters: ['[[', ']]'],
+        mounted: function() {
+
+        },
+    })
+</script>

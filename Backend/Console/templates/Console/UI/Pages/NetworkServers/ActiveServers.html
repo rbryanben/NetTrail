@@ -1,0 +1,60 @@
+<style>
+    .active-network-servers-wrapper {
+        padding: 20px;
+        position: relative;
+        height: calc(100vh - 124px);
+        overflow-y: scroll;
+    }
+    
+    .active-network-servers-wrapper .loader {
+        position: absolute;
+        left: calc(50% - 7.5px);
+        top: 50%;
+    }
+    
+    .active-network-servers-wrapper .header {
+        color: gray;
+        font-family: 'Ubuntu-Light';
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+</style>
+
+<template id="active_network_servers_template"> 
+    <div class="active-network-servers-wrapper">
+        <div class="loader" v-bind:class="{hide:getIsLoading}"></div>
+        <div class="header">Log retrival count is set to 1000</div>
+        <network-server v-for="server in servers" v-bind:content="server"></network-server>
+    </div>
+</template>
+
+<script>
+    const activeNetworkServersPage = Vue.component('server-logs-page', {
+        template: '#active_network_servers_template',
+        delimiters: ['[[', ']]'],
+        data: function() {
+            return {
+                servers: [],
+                isLoading: true
+            }
+        },
+        mounted: function() {
+            this.getServers()
+        },
+        methods: {
+            getServers: function() {
+                getFromServer("/api/getServers", null, (result, status) => {
+                    this.isLoading = false
+                    if (status == 200) {
+                        this.servers = JSON.parse(result)
+                    }
+                })
+            }
+        },
+        computed: {
+            getIsLoading: function() {
+                return !this.isLoading
+            }
+        }
+    })
+</script>

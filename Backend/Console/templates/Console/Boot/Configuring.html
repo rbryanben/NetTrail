@@ -1,0 +1,144 @@
+<!-- Style -->
+<style>
+    .configuration-template-wrapper {
+        height: 100vh;
+        position: relative;
+    }
+    
+    .configuration-template-wrapper .details-wrapper {
+        animation: insert 0.15s ease-out;
+        position: fixed;
+        left: 50%;
+        top: 45%;
+        transform: translate(-50%, -50%);
+    }
+    
+    .configuration-template-wrapper .details-wrapper.hide {
+        display: none;
+    }
+    
+    .configuration-template-wrapper .details-wrapper .input {
+        margin-top: 10px;
+        width: 380px;
+    }
+    
+    .configuration-template-wrapper .details-wrapper .heading {
+        margin-top: 20px;
+    }
+    
+    .configuration-template-wrapper .window-header {
+        position: absolute;
+        top: -60px;
+        left: 0;
+        color: gray;
+    }
+</style>
+
+<!-- Template -->
+<template id="configuration_template">
+    <div class="configuration-template-wrapper">
+ 
+        <dialog-component ref="configurationDialog" v-bind:content="configureButtonContent" v-on:accepted="configure"></dialog-component>
+    
+
+        <!-- details wrapper -->
+        <div class="details-wrapper panel-light tl" v-bind:class="{ hide :getAcceptedConfiguration}">
+            <div class="window-header">
+                Service Configuration
+            </div>
+
+            <div class="tm heading">Application gateway address (IPv4)</div>
+            <div class="input">
+                <input-component v-bind:content="applicationServer"></input-component>
+            </div>
+            <div class="tm heading">Service log buffer</div>
+            <div class="input">
+                <input-component v-bind:content="serviceLogBuffer"></input-component>
+            </div>
+            <div class="tm heading">Log retrivial count</div>
+            <div class="input">
+                <input-component v-bind:content="logRetrivialCount"></input-component>
+            </div>
+            <div class="div-flex end heading">
+                <button-inapp v-bind:content="configureButton"></button-inapp>
+            </div> 
+  
+        </div>
+        
+    </div>
+</template>
+
+<!-- Script -->
+<script>
+    const ConfigurationWindowData = {
+        configureButtonContent: {
+            header: 'Configure service',
+            body: 'It appears the service application has not been configured. This could be because the service configuration file is incorrect or service has not been configured.',
+            accept: 'Configure',
+            autoShow: true
+        },
+        applicationServer: {
+            placeholder: '127.0.0.1',
+            value: ''
+        },
+        serviceLogBuffer: {
+            placeholder: '20',
+            value: 20
+        },
+        logRetrivialCount: {
+            placeholder: '1000',
+            value: 1000
+        },
+        context: this,
+        configureButton: {
+            text: "Configure",
+            action: function(done) {
+                var data = {
+                    "gateway_application_ip": ConfigurationWindowData.applicationServer.value,
+                    "log_retrival_count": ConfigurationWindowData.logRetrivialCount.value,
+                    "server_log_buffer": ConfigurationWindowData.serviceLogBuffer.value,
+                }
+                postToServer('/api/configureService', data, (result, status) => {
+                    done()
+                    if (status == 200) {
+                        ConfigurationWindowData.acceptedConfiguration = false
+                        showLoading(true)
+                        setTimeout(function() {
+                            showLoading(false)
+                            router.push('/Console')
+                        }, 2000)
+
+                    }
+                })
+            }
+        },
+        acceptedConfiguration: false
+
+    }
+
+
+    const ConfigurationWindow = Vue.component('configuration-window', {
+        template: '#configuration_template',
+        delimiters: ['[[', ']]'],
+        data: function() {
+            return ConfigurationWindowData
+        },
+        methods: {
+            configure: function() {
+                showLoading(true)
+                setTimeout(function() {
+                    showLoading(false)
+                    ConfigurationWindowData.acceptedConfiguration = true
+                }, 1000)
+            },
+        },
+        computed: {
+            getAcceptedConfiguration: function() {
+                if (!this.acceptedConfiguration) {
+                    return true
+                }
+                return false
+            }
+        }
+    })
+</script>

@@ -1,0 +1,61 @@
+<style>
+    .button-inapp {
+        background-color: var(--color-primary);
+        color: white;
+        position: relative;
+        margin-right: -13px;
+    }
+    
+    .button-inapp.loading {
+        color: transparent;
+    }
+    
+    .button-inapp.loading .loader {
+        visibility: visible;
+    }
+    
+    .button-inapp .loader {
+        top: calc(50% - 8px) !important;
+        left: calc(50% - 8px) !important;
+        position: absolute;
+        border-top: solid 3px white;
+        height: 12px;
+        width: 12px;
+        visibility: hidden;
+    }
+</style>
+
+<template id="button_template"> 
+    <span class="button button-inapp ts" v-bind:class="{loading:getSendingRequest}" v-on:click="clicked">
+        [[content.text]]
+        <div class="loader"></div>
+    </span>
+</template>
+
+<script>
+    const loaderComponent = Vue.component('button-inapp', {
+        template: '#button_template',
+        delimiters: ['[[', ']]'],
+        methods: {
+            clicked: function() {
+                this.sendingRequest = true
+
+                this.content.action(() => {
+                    this.sendingRequest = false
+                })
+            }
+        },
+        data: function() {
+            return {
+                sendingRequest: false
+            }
+        },
+        computed: {
+            getSendingRequest: function() {
+                return this.sendingRequest
+            }
+        },
+        props: ["content"]
+
+    })
+</script>

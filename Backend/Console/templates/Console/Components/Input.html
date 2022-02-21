@@ -1,0 +1,32 @@
+<style>
+    .input-component-wrapper input {
+        height: 30px;
+        outline: none;
+        border: solid 1.6px silver;
+        border-radius: 3px;
+        font-family: "Ubuntu";
+        padding-left: 10px;
+        color: var(--text-light);
+        transition: all 0.1s ease-in;
+        width: 100%;
+        background-color: transparent;
+    }
+    
+    .input-component-wrapper input:valid {
+        border: solid 1.6px var(--color-input-highlight);
+    }
+</style>
+
+<template id="input_component_template">
+    <div class="input-component-wrapper">
+        <input class="tm" required v-model="content.value" v-bind:placeholder="content.placeholder">
+    </div>
+</template>
+
+<script>
+    const inputComponent = Vue.component('input-component', {
+        template: "#input_component_template",
+        delimiters: ['[[', ']]'],
+        props: ['content']
+    })
+</script>

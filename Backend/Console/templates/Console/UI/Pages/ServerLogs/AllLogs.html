@@ -1,0 +1,60 @@
+<style>
+    .allserver-logs-wrapper {
+        padding: 20px;
+        position: relative;
+        height: calc(100vh - 124px);
+        overflow-y: scroll;
+    }
+    
+    .allserver-logs-wrapper .loader {
+        position: absolute;
+        left: calc(50% - 7.5px);
+        top: 50%;
+    }
+    
+    .allserver-logs-wrapper .header {
+        color: gray;
+        font-family: 'Ubuntu-Light';
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+</style>
+
+<template id="all_server_logs_template"> 
+    <div class="allserver-logs-wrapper">
+        <div class="loader" v-bind:class="{hide:getIsLoading}"></div>
+        <div class="header">Log retrival count is set to 1000</div>
+        <server-log v-for="log in logs" v-bind:content="log"></server-log>
+    </div>
+</template>
+
+<script>
+    const allServerLogsPage = Vue.component('server-logs-page', {
+        template: '#all_server_logs_template',
+        delimiters: ['[[', ']]'],
+        data: function() {
+            return {
+                logs: [],
+                isLoading: true
+            }
+        },
+        mounted: function() {
+            this.getServerLogs()
+        },
+        methods: {
+            getServerLogs: function() {
+                getFromServer("/api/getServerLogs", null, (result, status) => {
+                    this.isLoading = false
+                    if (status == 200) {
+                        this.logs = JSON.parse(result)
+                    }
+                })
+            }
+        },
+        computed: {
+            getIsLoading: function() {
+                return !this.isLoading
+            }
+        }
+    })
+</script>

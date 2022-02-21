@@ -1,0 +1,34 @@
+<style>
+    .server-log {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 0.5fr 1.2fr 1.2fr;
+        margin-top: 5px;
+        padding: 20px 10px;
+        border-radius: 4px;
+        background-color: rgba(192, 192, 192, 0.089);
+    }
+</style>
+
+<template id="server_log_component_template">
+    <div class="server-log ts" v-bind:title="getSummary">
+        <div>Server: [[content.server.hostname]]</div>
+        <div>Source: [[content.src_ip]]</div>
+        <div>Destination: [[content.dest_ip]]</div>
+        <div>Protocol: [[content.protocol]]</div>
+        <div>Local Time: [[content.time_local]]</div>
+        <div>Logs Received: 2022-02-19 10:52:45</div>
+    </div>
+</template>
+
+<script>
+    const serverLogComponent = Vue.component('server-log', {
+        template: "#server_log_component_template",
+        delimiters: ['[[', ']]'],
+        props: ['content'],
+        computed: {
+            getSummary: function() {
+                return ` Log from ${this.content.server.hostname} captured ${this.content.time_local}.${this.content.protocol} packet sent from ${this.content.src_ip} to ${this.content.dest_ip} `
+            }
+        }
+    })
+</script>

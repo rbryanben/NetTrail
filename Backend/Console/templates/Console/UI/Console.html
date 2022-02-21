@@ -1,0 +1,56 @@
+<!-- template -->
+<template id="console_window">
+    <div class="console">
+        <!-- side-panel -->
+        <div class="side-panel">
+            <!-- Heading -->
+            <div class="heading">
+                <!-- Workspace Selector -->
+                <div class="workspace-selector-wrapper">
+                    <div class="workspace-selector" title="Select your workspace.">
+                        <!-- Workspace Image -->
+                        <div class="workspace-image">
+                            <img src="/static/img/pineapple.png">
+                        </div>
+                        <!-- Workspace Detail -->
+                        <div class="div-flex ts">
+                            <div>
+                                <div><strong>Wapazock</strong></div>
+                                <div style="font-family: 'Ubuntu-Light';margin-top: 4px;">Workspace</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Navigation -->
+            <div class="navigation">
+                <div class="menu">
+                    Left 
+                </div>
+                <div class="sub-menu">
+                    <div class="item tm selected">
+                        Network Servers
+                    </div>
+                    <div class="item tm">
+                        Server Logs
+                    </div>
+                    <div class="item tm">
+                        Watch Events
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- main panel -->
+        <div class="main-panel">
+            <!-- Page -->
+            <router-view></router-view>
+        </div>
+    </div>
+</template>
+
+<!-- Script -->
+<script>
+    const ConsoleWindow = Vue.component('console_window', {
+        template: "#console_window",
+    })
+</script>

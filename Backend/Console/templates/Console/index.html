@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netrail | Console</title>
+    <!-- Vue.js -->
+    <script src="/static/lib/Vue/vue.js"></script>
+    <script src="/static/lib/Vue/vue-router.js"></script>
+    <!-- Font Awesome-->
+    <link rel="stylesheet" href="/static/lib/fontawesome-free-5.15.3-web/css/all.min.css">
+    <script src="/static/lib/fontawesome-free-5.15.3-web/js/all.min.js"></script>
+    <!-- Mopane -->
+    <link rel="stylesheet" href="/static/lib/Mopane/all.css">
+    <script src="/static/lib/Wapazock/communication.js"></script>
+    <!-- JQuery -->
+    <script src="/static/lib/JQuery/jquery-3.1.1.min.js"></script>
+
+    <!-- Color Picker -->
+    <link rel="stylesheet" href="/static/lib/ColorPicker/colorPick.css">
+    <script src="/static/lib/ColorPicker/colorPick.js"></script>
+
+    <!-- Main -->
+    <link rel="stylesheet" href="/static/css/index.css">
+    <script src="/static/js/Global.js"></script>
+    <link rel="stylesheet" href="/static/css/Console.css">
+    <!--Manifest -->
+    <link rel="manifest" href="/static/web/app.webmanifest">
+</head>
+
+<body>
+    <!-- Global Windows -->
+    <div id="loadingWindow" class="window show">
+        <div class="div-flex center loading-window-wrapper show">
+            <div class="loader">
+            </div>
+        </div>
+    </div>
+
+    <!-- Components -->
+    {%include 'Console/Boot/Configuring.html' %}
+    <!-- -->
+    {%include 'Console/UI/Console.html' %}
+    <!-- -->
+    {%include 'Console/UI/Pages/ServerLogs.html' %}
+    <!-- -->
+    {%include 'Console/UI/Pages/NetworkServers.html' %}
+    <!-- -->
+    {%include 'Console/UI/Pages/NetworkServers/ActiveServers.html' %}
+    <!-- -->
+    {%include 'Console/UI/Pages/ServerLogs/AllLogs.html' %}
+    <!-- -->
+    {%include 'Console/Components/Dialog.html' %}
+    <!-- -->
+    {%include 'Console/Components/Button.html' %}
+    <!-- -->
+    {%include 'Console/Components/Input.html' %}
+    <!-- -->
+    {%include 'Console/Components/ServerLog.html' %}
+    <!-- -->
+    {%include 'Console/Components/NetworkServer.html' %}
+
+    <!-- Main Application -->
+    <div id="Application">
+        <router-view></router-view>
+    </div>
+
+    <script src="/static/js/index.js"></script>
+</body>
+
+</html>
