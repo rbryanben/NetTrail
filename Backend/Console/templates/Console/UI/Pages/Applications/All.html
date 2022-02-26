@@ -1,0 +1,110 @@
+<style>
+    .all-applications-wrapper {
+        padding: 20px;
+        position: relative;
+        height: calc(100vh - 124px);
+        overflow-y: scroll;
+        background-color: #f3f3f30c;
+    }
+    
+    .all-applications-wrapper .loader {
+        position: absolute;
+        left: calc(50% - 7.5px);
+        top: 50%;
+    }
+    
+    .all-applications-wrapper .header {
+        color: gray;
+        font-family: 'Ubuntu-Light';
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+</style>
+
+<template id="all_applications_template"> 
+    <div class="all-applications-wrapper">
+        <div class="loader" v-bind:class="{hide:getIsLoading}"></div>
+        <div class="header">List of applications</div>
+        <application-editor ref="applicationEditor"></application-editor>
+        <quick-menu v-bind:menu="quickMenuOptions" ref="applicationsQuickMenu"></quick-menu>
+        <addapp ref="addApplication" v-on:done="init"></addapp>
+        <application-component v-for="app in applications" v-on:quick-menu="showMenu($event)" v-on:edit="editApp($event)" v-bind:content="app"></application-component>
+    </div>
+</template>
+
+<script>
+    const allApplicationsPage = Vue.component('server-logs-page', {
+        template: '#all_applications_template',
+        delimiters: ['[[', ']]'],
+        data: function() {
+            return {
+                applications: [],
+                isLoading: true,
+                quickMenuOptions: [{
+                    title: "Edit",
+                    action: (args) => {
+                        alert("Edit Application")
+                    }
+                }, {
+                    title: "View Logs",
+                    action: (args) => {
+                        router.push('/Console/Applications/ApplicationLogs/AppLogs/AllLogs/Application/' + args.app)
+                    }
+                }, {
+                    title: "Create Application",
+                    action: (args) => {
+                        var content = {
+                            callback: this.init,
+                            route: null
+                        }
+                        this.$refs.addApplication.edit(content)
+                    }
+                }, {
+                    title: "Delete Application",
+                    action: (server_id) => {
+                        alert("Delete")
+                    }
+                }, {
+                    title: "Refresh",
+                    action: (server_id) => {
+                        this.init()
+                    }
+                }]
+            }
+        },
+        created: function() {
+            this.init()
+        },
+        methods: {
+            init: function() {
+                this.getApplications()
+
+            },
+            getApplications: function() {
+                getFromServer('/api/applications', null, (result, status) => {
+                    this.isLoading = false
+                    this.applications = JSON.parse(result)
+                    if (this.applications.length == 0) {
+                        this.applications = [{
+                            id: -1,
+                            color_tag: "gray",
+                            url_path: "All",
+                            user_defined_name: "Default"
+                        }]
+                    }
+                })
+            },
+            editApp: function(content) {
+                this.$refs.applicationEditor.edit(content)
+            },
+            showMenu: function(args) {
+                this.$refs.applicationsQuickMenu.show(args)
+            }
+        },
+        computed: {
+            getIsLoading: function() {
+                return !this.isLoading
+            }
+        }
+    })
+</script>

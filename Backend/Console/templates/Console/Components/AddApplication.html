@@ -1,0 +1,104 @@
+<style>
+    .addapp-editor {
+        top: 50%;
+        display: none;
+    }
+    
+    .addapp-editor.show {
+        display: block;
+    }
+    
+    .addapp-editor .heading_ {
+        padding: 0;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        width: 380px;
+        left: 0;
+    }
+</style>
+
+<template id="addapp-editor-component-template">
+    <div class="addapp-editor panel" v-bind:class="{show:isEditing}">
+        <div class="tm heading_">Application Name</div>
+        <div class="input">
+            <input-component v-bind:content="name"></input-component>
+        </div>
+        <div class="tm heading_">Upstream Route</div>
+        <div class="input">
+            <input-component v-bind:content="route"></input-component>
+        </div>
+        <div class="tm heading_">Color Tag</div>
+        <div class="input">
+            <input-component v-bind:content="color"></input-component>
+        </div>
+        <div class="div-flex end heading_" style="margin-bottom: 0;">
+            <button-inapp ref="createButton" v-bind:content="updateButton"></button-inapp>
+        </div> 
+    </div>
+</template>
+
+<script>
+    let addappEditorComponentData = {
+        name: {
+            placeholder: "Application Name",
+            value: ""
+        },
+        route: {
+            placeholder: "Route",
+            value: ""
+        },
+        color: {
+            placeholder: "#222222",
+            value: ""
+        },
+        updateButton: {
+            text: "Create",
+            action: function(done) {
+                var data = {
+                    name: addappEditorComponentData.name.value,
+                    route: addappEditorComponentData.route.value,
+                    color: addappEditorComponentData.color.value
+                }
+                postToServer('/api/applications', data, (result, status) => {
+                    if (status == 200) {
+                        done()
+                            //Reset
+                        addappEditorComponentData.name.value = ""
+                        addappEditorComponentData.route.value = ""
+                        addappEditorComponentData.color.value = ""
+
+                        addappEditorComponentData.context.editDone()
+                    } else {
+                        alert("Exists")
+                        done()
+                    }
+                })
+            }
+        },
+        isEditing: false,
+        callback: null,
+        app_id: null,
+        context: null
+    }
+
+    const addappEditorComponent = Vue.component('addapp', {
+        template: "#addapp-editor-component-template",
+        data: function() {
+            return addappEditorComponentData
+        },
+        props: ["content"],
+        methods: {
+            edit: function(content) {
+                this.callback = content.callback
+                this.context = this
+                dimWindow(true)
+                this.isEditing = true
+            },
+            editDone: function() {
+                dimWindow(false)
+                this.$emit("done")
+                this.isEditing = false
+            }
+        }
+    })
+</script>

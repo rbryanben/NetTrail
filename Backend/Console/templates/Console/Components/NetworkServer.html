@@ -7,6 +7,7 @@
         border-radius: 4px;
         background-color: rgba(192, 192, 192, 0.089);
         transition: all 0.1s ease-out;
+        border: solid 1px rgba(192, 192, 192, 0.377);
     }
     
     .network-server.editing {
@@ -23,8 +24,9 @@
     }
 </style>
 
+
 <template id="network_server_component_template">
-    <div class="network-server ts" v-bind:class="{editing:isEditing}" v-bind:title="getSummary" v-on:dblclick="edit">
+    <div class="network-server ts" @contextmenu.prevent="quickActions($event)" v-bind:class="{editing:isEditing}" v-bind:title="getSummary" v-on:dblclick="edit">
         <div class="div-flex start">Color Tag: <div class="color-tag" v-bind:id="content.hostname" ></div></div>
         <div>Hostname: [[content.hostname]]</div>
         <div>IPv4: [[content.last_known_ip]]</div>
@@ -47,12 +49,29 @@
         props: ['content'],
         computed: {
             getSummary: function() {
-                return 'Hello there'
+                return 'Server Summary Not Implented'
             }
         },
         methods: {
             edit: function() {
                 this.isEditing = true
+                var parcel = {
+                    data: this.content,
+                    callback: (content) => {
+                        this.isEditing = false
+                        this.content.hostname = content.hostname
+                        this.content.last_known_ip = content.ipv4
+                        this.content.user_defined_name = content.name
+                    }
+                }
+                this.$emit('edit', parcel)
+            },
+            quickActions: function(event) {
+                var parcel = {
+                    id: this.content.id,
+                    "event": event
+                }
+                this.$emit("quick-menu", parcel)
             }
         },
         mounted: function() {

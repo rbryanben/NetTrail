@@ -10,8 +10,8 @@
     <script src="/static/lib/Vue/vue.js"></script>
     <script src="/static/lib/Vue/vue-router.js"></script>
     <!-- Font Awesome-->
-    <link rel="stylesheet" href="/static/lib/fontawesome-free-5.15.3-web/css/all.min.css">
-    <script src="/static/lib/fontawesome-free-5.15.3-web/js/all.min.js"></script>
+    <link rel="stylesheet" href="/static/lib/fontawesome-free-6.0.0-web/css/all.min.css">
+    <script src="/static/lib/fontawesome-free-6.0.0-web/js/all.min.js"></script>
     <!-- Mopane -->
     <link rel="stylesheet" href="/static/lib/Mopane/all.css">
     <script src="/static/lib/Wapazock/communication.js"></script>
@@ -46,6 +46,14 @@
     <!-- -->
     {%include 'Console/UI/Pages/ServerLogs.html' %}
     <!-- -->
+    {%include 'Console/UI/Pages/Applications.html' %}
+    <!-- -->
+    {%include 'Console/UI/Pages/Applications/All.html' %}
+    <!-- -->
+    {%include 'Console/UI/Pages/ApplicationLogs.html' %}
+    <!-- -->
+    {%include 'Console/UI/Pages/ApplicationLogs/AllApplicationLogs.html' %}
+    <!-- -->
     {%include 'Console/UI/Pages/NetworkServers.html' %}
     <!-- -->
     {%include 'Console/UI/Pages/NetworkServers/ActiveServers.html' %}
@@ -61,10 +69,27 @@
     {%include 'Console/Components/ServerLog.html' %}
     <!-- -->
     {%include 'Console/Components/NetworkServer.html' %}
+    <!-- -->
+    {%include 'Console/Components/NetworkServerEditor.html' %}
+    <!-- -->
+    {%include 'Console/Components/QuickMenu.html' %}
+    <!-- -->
+    {%include 'Console/Components/ApplicationLog.html' %}
+    <!-- -->
+    {%include 'Console/Components/Application.html' %}
+    <!-- -->
+    {%include 'Console/Components/ApplicationEditor.html' %}
+    <!-- -->
+    {%include 'Console/Components/AddApplication.html' %}
 
     <!-- Main Application -->
     <div id="Application">
         <router-view></router-view>
+    </div>
+
+    <!-- Dim Panel -->
+    <div class="dim-panel">
+
     </div>
 
     <script src="/static/js/index.js"></script>

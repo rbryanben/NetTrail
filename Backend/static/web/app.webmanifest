@@ -4,8 +4,8 @@
     "description": "Progressive Web App that monitors network and application logs.",
     "start_url": "/",
     "display": "fullscreen",
-    "theme_color": "#2c47c4",
-    "background_color": "#8080803a",
+    "theme_color": "#616263",
+    "background_color": "#ebebeb",
     "icons": [{
             "src": "/static/img/icon-32.png",
             "sizes": "32x32",

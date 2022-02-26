@@ -1,0 +1,75 @@
+<style>
+    .application-log {
+        display: grid;
+        grid-template-columns: 0.4fr 0.8fr 0.8fr 0.5fr 0.5fr 1.5fr;
+        margin-top: 5px;
+        padding: 20px 10px;
+        border-radius: 4px;
+        border: solid 1px rgba(192, 192, 192, 0.377);
+        background-color: rgba(192, 192, 192, 0.089);
+        animation: slide_up 0.3s ease-out;
+        transition: all 0.2s ease-out;
+    }
+    
+    .application-log.extend {
+        grid-template-columns: 1fr;
+        grid-gap: 17px;
+        padding-left: 20px;
+        background-color: white;
+        cursor: text;
+    }
+    
+    .application-log>div {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
+<template id="application_log_component_template">
+    <div class="application-log ts" v-on:dblclick="toogleExtend"  @contextmenu.prevent="quickActions($event)" v-bind:class="{extend : getExtended}">
+        <div class="div-flex start" v-if="getExtended == false">App Tag: <div class="color-tag" v-bind:style="{backgroundColor : content.Application.color}"></div></div>
+        <div>Application: [[content.Application.name]]</div>
+        <div>Remote: [[content.remote_addr]]</div>
+        <div>Status: [[content.status]]</div>
+        <div>Bytes Sent: [[content.body_bytes_sent]]</div>
+        <div>[[content.request]]</div>
+    </div>
+</template>
+
+<script>
+    const applicationLogComponent = Vue.component('application-log', {
+        template: "#application_log_component_template",
+        delimiters: ['[[', ']]'],
+        data: function() {
+            return {
+                extended: false,
+                style: {
+                    backgroundColor: this.content.Application.color
+                }
+            }
+        },
+        props: ['content'],
+        computed: {
+            getExtended: function() {
+                return this.extended
+            },
+            getStyle: function() {
+                return this.style
+            }
+        },
+        methods: {
+            toogleExtend: function() {
+                this.extended = !this.extended
+            },
+            quickActions: function(event) {
+                var parcel = {
+                    id: this.content.Application.path,
+                    radd: this.content.remote_addr,
+                    "event": event
+                }
+                this.$emit("quick-menu", parcel)
+            }
+        }
+    })
+</script>

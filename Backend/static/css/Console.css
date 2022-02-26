@@ -9,12 +9,12 @@
 }
 
 .console .heading {
-    height: 80px;
+    height: 90px;
     border-bottom: solid 1px rgba(192, 192, 192, 0.377);
 }
 
 .console .side-panel .heading {
-    height: 80px;
+    height: 90px;
     border-bottom: solid 1px rgba(192, 192, 192, 0.178);
     background-color: rgba(255, 255, 255, 0.644);
 }
@@ -22,6 +22,7 @@
 .console .heading .workspace-selector-wrapper {
     padding: 6px 8px;
     height: 70px;
+    transform: translateY(10px);
 }
 
 .console .heading .workspace-selector {
@@ -32,7 +33,12 @@
     cursor: pointer;
     padding: 5px;
     display: grid;
-    grid-template-columns: 1.2fr 3fr;
+    grid-template-columns: 1.2fr 3fr 0.5fr;
+}
+
+.console .heading .workspace-selector .up-down {
+    transform: scale(0.6);
+    color: gray;
 }
 
 .console .heading .workspace-selector img {
@@ -48,14 +54,33 @@
 }
 
 .console .side-panel .navigation .menu {
-    background-color: rgba(255, 255, 255, 0.61);
+    background-color: white;
     border-right: solid 1px rgba(192, 192, 192, 0.377);
     height: calc(100vh - 82px);
+    z-index: 100;
+}
+
+.console .side-panel .navigation .menu .item {
+    margin: 15px 5px;
+    height: 36.5px;
+    border-radius: 4px;
+    color: gray;
+    cursor: pointer;
+    transition: all 0.2s ease-in;
+}
+
+.console .side-panel .navigation .menu .item.selected {
+    background-color: rgba(192, 192, 192, 0.253);
+}
+
+.console .side-panel .navigation .menu .item:hover {
+    background-color: rgba(192, 192, 192, 0.151);
 }
 
 .console .side-panel .navigation .sub-menu {
     height: calc(100vh - 82px);
     font-family: 'Ubuntu-Light';
+    animation: slide_right 0.3s ease-out;
 }
 
 .console .side-panel .navigation .sub-menu :first-child {

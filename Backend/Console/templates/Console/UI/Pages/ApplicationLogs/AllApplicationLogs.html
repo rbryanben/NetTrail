@@ -1,0 +1,122 @@
+<style>
+    .all-application-logs-wrapper {
+        padding: 20px;
+        position: relative;
+        height: calc(100vh - 124px);
+        overflow-y: scroll;
+        background-color: #f3f3f30c;
+    }
+    
+    .all-application-logs-wrapper .loader {
+        position: absolute;
+        left: calc(50% - 7.5px);
+        top: 50%;
+    }
+    
+    .all-application-logs-wrapper .header {
+        color: gray;
+        font-family: 'Ubuntu-Light';
+        margin-top: 30px;
+        margin-bottom: 20px;
+    }
+</style>
+
+<template id="all_application_logs_template"> 
+    <div class="all-application-logs-wrapper">
+        <div class="loader" v-bind:class="{hide:getIsLoading}"></div>
+        <div class="header">Log retrival count is set to 1000</div>
+        <application-log v-on:quick-menu="showQuickMenu($event)" v-for="log in getLogs" v-bind:content="log"></application-log>
+        <quick-menu v-bind:menu="quickMenuOptions"  ref="application_quick_menu"></quick-menu>
+    </div>
+</template>
+
+<script>
+    const allApplicationLogsPage = Vue.component('all-application-logs-page', {
+        template: '#all_application_logs_template',
+        delimiters: ['[[', ']]'],
+        data: function() {
+            return {
+                logs: [],
+                isLoading: true,
+                isUpdating: false,
+                quickMenuOptions: [{
+                    title: "Expand",
+                    action: (args) => {
+                        alert("Expand Log")
+                    }
+                }, {
+                    title: "Create Application",
+                    action: (args) => {
+                        alert("Create application " + args.id)
+                    }
+                }, {
+                    title: "Filter Application",
+                    action: (args) => {
+                        router.push(`${args.id}`)
+                    }
+                }, {
+                    title: "Filter Remote",
+                    action: (args) => {
+                        alert("View Server Logs: " + args.radd)
+                    }
+                }, {
+                    title: "Refresh",
+                    action: (args) => {
+                        this.init()
+                    }
+                }]
+            }
+        },
+        mounted: function() {
+
+        },
+        methods: {
+            getAllApplicationLogs: function() {
+                // Get Logs
+                getFromServer("/api/getApplicationLogs", null, (result, status) => {
+                    this.isLoading = false
+                    if (status == 200) {
+                        this.logs = []
+                        this.logs = JSON.parse(result)
+                    }
+                })
+            },
+            getApplicationLogs: function(app) {
+                // Get Logs
+                getFromServer(`/api/getApplicationLogs?Application=${app}`, null, (result, status) => {
+                    this.isLoading = false
+                    if (status == 200) {
+                        this.logs = []
+                        this.logs = JSON.parse(result)
+                    }
+                })
+            },
+            showQuickMenu: function(args) {
+                this.$refs.application_quick_menu.show(args)
+            },
+            init: function() {
+                var application = this.$route.params.application_name
+                if (application == "All") {
+                    this.getAllApplicationLogs()
+                } else
+                    this.getApplicationLogs(application)
+            }
+        },
+        computed: {
+            getIsLoading: function() {
+                return !this.isLoading
+            },
+            getLogs: function() {
+                return this.logs
+            }
+        },
+        created: function() {
+            this.init()
+        },
+        watch: {
+            $route(to, from) {
+                this.init()
+            }
+        }
+    })
+</script>

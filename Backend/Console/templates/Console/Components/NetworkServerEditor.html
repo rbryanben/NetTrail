@@ -1,0 +1,103 @@
+<style>
+    .network-server-editor {
+        top: 50%;
+        display: none;
+    }
+    
+    .network-server-editor.show {
+        display: block;
+    }
+    
+    .network-server-editor .heading_ {
+        padding: 0;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        width: 380px;
+        left: 0;
+    }
+</style>
+
+<template id="network-server-editor-component-template">
+    <div class="network-server-editor panel" v-bind:class="{show:isEditing}">
+        <div class="tm heading_">Server Hostname</div>
+        <div class="input">
+            <input-component v-bind:content="hostname"></input-component>
+        </div>
+        <div class="tm heading_">Server Name</div>
+        <div class="input">
+            <input-component v-bind:content="name"></input-component>
+        </div>
+        <div class="tm heading_">Server IPv4</div>
+        <div class="input">
+            <input-component v-bind:content="ipv4"></input-component>
+        </div>
+        <div class="div-flex end heading_" style="margin-bottom: 0;">
+            <button-inapp v-bind:content="updateButton" v-on:done="editDone"></button-inapp>
+        </div> 
+    </div>
+</template>
+
+<script>
+    let networkServerEditorComponentData = {
+        hostname: {
+            placeholder: "Server Hostname",
+            value: ""
+        },
+        name: {
+            placeholder: "Server Name",
+            value: ""
+        },
+        ipv4: {
+            placeholder: "127.0.0.1",
+            value: ""
+        },
+        updateButton: {
+            text: "Update",
+            action: function(done) {
+                var data = {
+                    "server_id": networkServerEditorComponentData.server_id,
+                    "user_defined_name": networkServerEditorComponentData.name.value,
+                    "ipv4": networkServerEditorComponentData.ipv4.value
+                }
+                updateToServer('/api/getServers', data, (result, status) => {
+                    if (status == 200) {
+                        done()
+                    } else {
+                        alert("Inernal Server Error")
+                    }
+                })
+            }
+        },
+        isEditing: false,
+        callback: null,
+        server_id: null
+    }
+
+    const networkServerEditorComponent = Vue.component('network-server-editor', {
+        template: "#network-server-editor-component-template",
+        data: function() {
+            return networkServerEditorComponentData
+        },
+        props: ["content"],
+        methods: {
+            edit: function(content) {
+                this.hostname.value = content.data.hostname
+                this.name.value = content.data.user_defined_name
+                this.ipv4.value = content.data.last_known_ip
+                this.callback = content.callback
+                this.server_id = content.data.id
+                dimWindow(true)
+                this.isEditing = true
+            },
+            editDone: function() {
+                dimWindow(false)
+                this.isEditing = false
+                this.callback({
+                    'hostname': networkServerEditorComponentData.hostname.value,
+                    'ipv4': networkServerEditorComponentData.ipv4.value,
+                    'name': networkServerEditorComponentData.name.value
+                })
+            }
+        }
+    })
+</script>

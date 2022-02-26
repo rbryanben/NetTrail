@@ -30,7 +30,7 @@
     }
 </style>
 <template id="dialog_template">
-    <div class="panel dialog-wrapper" v-bind:class="{show:isShowing || content.autoShow}">
+    <div class="panel dialog-wrapper show" v-bind:class="{show:isShowing || content.autoShow}" >
         <div class="tl header">[[content.header]]</div>
         <div class="ts body">[[content.body]]</div>
         <div class="procceed-button-wrapper div-flex end">

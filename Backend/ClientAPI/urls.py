@@ -9,5 +9,6 @@ urlpatterns = [
     path("serverLogsHandler",receiveServerLogs, name="Server Logs Handler"),
     path("getServers",getServers,name="Get Servers"),
     path("getServerLogs",getServerLogs,name="Get Server Logs"),
-
+    path("getApplicationLogs",applicationLogs,name="Application Logs"),
+    path("applications",applications_,name="Applications")
 ]

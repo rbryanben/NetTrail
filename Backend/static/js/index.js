@@ -3,8 +3,9 @@ let ApplicationData = {
 
 }
 
+/*
 const routes = [
-    { path: "/", redirect: "/Console/ServerLogs/AllLogs" },
+    { path: "/", redirect: "/Console/ServerLogs/AllLogs/Server/All" },
     {
         path: "/Console",
         component: ConsoleWindow,
@@ -12,7 +13,7 @@ const routes = [
             path: "ServerLogs",
             component: serverLogsPage,
             children: [{
-                path: "AllLogs",
+                path: "AllLogs/Server/:server_id",
                 component: allServerLogsPage
             }]
         }, {
@@ -24,7 +25,55 @@ const routes = [
             }]
         }]
     },
-    { path: "Configure", component: ConfigurationWindow },
+    { path: "/Configure", component: ConfigurationWindow },
+] */
+
+const routes = [{
+        path: "/Console",
+        redirect: "/Console/Network/NetworkServers/Servers/ActiveServers"
+    },
+    {
+        path: "/",
+        redirect: "/Console/Network/NetworkServers/Servers/ActiveServers"
+    },
+    { path: "/Configure", component: ConfigurationWindow },
+
+    {
+        path: "/Console/:menu/:sub_menu",
+        component: ConsoleWindow,
+        children: [{
+                path: "Logs",
+                component: serverLogsPage,
+                children: [{
+                    path: "AllLogs/Server/:server_id",
+                    component: allServerLogsPage
+                }]
+            }, {
+                path: "Servers",
+                component: networkServersPage,
+                children: [{
+                    path: "ActiveServers",
+                    component: activeNetworkServersPage
+                }]
+            },
+            {
+                path: "AppLogs",
+                component: applicationLogsPage,
+                children: [{
+                    path: "AllLogs/Application/:application_name",
+                    component: allApplicationLogsPage
+                }]
+            },
+            {
+                path: "Apps",
+                component: applicationsPage,
+                children: [{
+                    path: "All",
+                    component: allApplicationsPage
+                }]
+            }
+        ]
+    }
 ]
 
 const router = new VueRouter({
@@ -44,7 +93,6 @@ const MainApplication = new Vue({
     },
     methods: {
         startUp: function() {
-
             //check if the service is configure 
             getFromServer("/api/getServiceStatus", null, (response, status) => {
                 if (status == 501)
@@ -61,13 +109,4 @@ const MainApplication = new Vue({
 // Service Worker 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js')
-        .then(reg => {
-            console.log("Service Worker Registered")
-        })
-        .catch(error => {
-            console.log(`Service Worker Error : ${error}`)
-        })
-
-} else {
-    console.log('Service Worker Unvailable')
 }

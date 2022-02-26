@@ -4,6 +4,7 @@
         position: relative;
         height: calc(100vh - 124px);
         overflow-y: scroll;
+        background-color: #f3f3f30c;
     }
     
     .active-network-servers-wrapper .loader {
@@ -23,8 +24,10 @@
 <template id="active_network_servers_template"> 
     <div class="active-network-servers-wrapper">
         <div class="loader" v-bind:class="{hide:getIsLoading}"></div>
-        <div class="header">Log retrival count is set to 1000</div>
-        <network-server v-for="server in servers" v-bind:content="server"></network-server>
+        <quick-menu v-bind:menu="quickMenuOptions" ref="quick_menu"></quick-menu>
+        <div class="header">List of active network servers</div>
+        <network-server-editor ref="networkServerEditor" ></network-server-editor>
+        <network-server v-on:quick-menu="showQuickMenu($event)" v-for="server in servers" v-on:edit="editServer($event)" v-bind:content="server"></network-server>
     </div>
 </template>
 
@@ -35,7 +38,33 @@
         data: function() {
             return {
                 servers: [],
-                isLoading: true
+                isLoading: true,
+                quickMenuOptions: [{
+                    title: "Edit Server",
+                    action: (server_id) => {
+                        alert("Edit Server : " + server_id)
+                    }
+                }, {
+                    title: "View Server Logs",
+                    action: (args) => {
+                        router.push('/Console/Network/NetworkServerLogs/Logs/AllLogs/Server/' + args.id)
+                    }
+                }, {
+                    title: "Configure Server",
+                    action: (server_id) => {
+                        alert("View Server Logs: " + server_id)
+                    }
+                }, {
+                    title: "Health Check",
+                    action: (server_id) => {
+                        alert("View Server Logs: " + server_id)
+                    }
+                }, {
+                    title: "Refresh",
+                    action: (server_id) => {
+                        this.getServers()
+                    }
+                }]
             }
         },
         mounted: function() {
@@ -49,6 +78,12 @@
                         this.servers = JSON.parse(result)
                     }
                 })
+            },
+            editServer: function(content) {
+                this.$refs.networkServerEditor.edit(content)
+            },
+            showQuickMenu: function(args) {
+                this.$refs.quick_menu.show(args)
             }
         },
         computed: {

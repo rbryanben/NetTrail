@@ -19,23 +19,31 @@
                                 <div style="font-family: 'Ubuntu-Light';margin-top: 4px;">Workspace</div>
                             </div>
                         </div>
+                        <!-- Up and Down Arrows -->
+                        <div class="up-down">
+                            <div class="div-flex center" style="margin-top: 4px;">
+                                <i class="fas fa-angle-up"></i>
+                            </div>
+                            <div class="div-flex center">
+                                <i class="fas fa-angle-down"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             <!-- Navigation -->
             <div class="navigation">
                 <div class="menu">
-                    Left 
+                    <div class="item div-flex center"  style="margin-top: 20px;">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="item div-flex center"  v-for="menu in getMainMenu" v-on:click="goto(menu.redirect)" v-bind:class="{selected : menu.route == $route.params.menu}">
+                        <i v-bind:class="[menu.icon]"></i>
+                    </div>
                 </div>
-                <div class="sub-menu">
-                    <div class="item tm selected">
-                        Network Servers
-                    </div>
-                    <div class="item tm">
-                        Server Logs
-                    </div>
-                    <div class="item tm">
-                        Watch Events
+                <div class="sub-menu" >
+                    <div v-for="subMenu in getMenu.subMenu" v-on:click="goto(subMenu.redirect)" v-bind:class="{selected : subMenu.route == $route.params.sub_menu}" class="item tm">
+                        [[subMenu.text]]
                     </div>
                 </div>
             </div>
@@ -52,5 +60,80 @@
 <script>
     const ConsoleWindow = Vue.component('console_window', {
         template: "#console_window",
+        delimiters: ['[[', ']]'],
+        data: function() {
+            return {
+                menu: {
+                    network: {
+                        subMenu: [{
+                            route: "NetworkServers",
+                            text: "Network Servers",
+                            redirect: "/Console/Network/NetworkServers/Servers/ActiveServers"
+                        }, {
+                            text: "NetworkServerLogs",
+                            route: "NetworkServerLogs",
+                            redirect: "/Console/Network/NetworkServerLogs/Logs/AllLogs/Server/All"
+                        }, {
+                            route: "NetworkWatchEvents",
+                            text: "Network Watch Events",
+                            redirect: "#"
+                        }],
+                        icon: "fa-solid fa-diagram-project",
+                        route: "Network",
+                        redirect: '/Console/Network/NetworkServers/Servers/ActiveServers'
+                    },
+                    applications: {
+                        subMenu: [{
+                            route: "Applications",
+                            text: "Applications",
+                            redirect: "/Console/Applications/Applications/Apps/All"
+                        }, {
+                            text: "Application Logs",
+                            route: "ApplicationLogs",
+                            redirect: "/Console/Applications/ApplicationLogs/AppLogs/AllLogs/Application/All"
+                        }, {
+                            route: "NetworkWatchEvents",
+                            text: "Network Watch Events"
+                        }],
+                        icon: "fas fa-dice-d6",
+                        route: "Applications",
+                        redirect: "/Console/Applications/Applications/Apps/All"
+                    },
+                    settings: {
+                        subMenu: [],
+                        icon: "fa-solid fa-gear",
+                        route: "/Console/Settings/All"
+                    }
+                }
+
+            }
+        },
+        methods: {
+            goto: function(menu) {
+                try {
+                    router.push(menu)
+                } catch {
+
+                }
+            }
+        },
+        computed: {
+            getMenu: function() {
+                switch (this.$route.params.menu) {
+                    case "Network":
+                        return this.menu.network
+                    case "Applications":
+                        return this.menu.applications
+                    default:
+                        return []
+                }
+            },
+            getMainMenu: function() {
+                return this.menu
+            }
+        },
+        mounted: function() {
+
+        }
     })
 </script>

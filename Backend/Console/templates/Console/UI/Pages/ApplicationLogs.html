@@ -1,0 +1,35 @@
+<style>
+
+</style>
+
+<template id="application_logs_template"> 
+    <span>
+        <!-- Heading -->
+        <div class="heading">
+            <div class="page">Application Logs</div>
+            <div class="subpages">
+                <span class="page ts selected">
+                    All Logs
+                </span>
+                <span class="page ts ">
+                    Grouped Logs
+                </span>
+                <span class="page ts">
+                    Logs Stats
+                </span>
+            </div>
+        </div>
+
+        <router-view></router-view>
+    </span>
+</template>
+
+<script>
+    const applicationLogsPage = Vue.component('application-logs-page', {
+        template: '#application_logs_template',
+        delimiters: ['[[', ']]'],
+        mounted: function() {
+
+        },
+    })
+</script>

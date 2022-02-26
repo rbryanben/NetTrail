@@ -1,0 +1,69 @@
+<style>
+    .quick-menu {
+        width: 200px;
+        cursor: pointer;
+        position: fixed;
+        left: 0;
+        top: 0;
+        display: none;
+    }
+    
+    .quick-menu .item {
+        padding: 10px;
+        font-family: "Ubuntu-Light" !important;
+        border-bottom: solid 0.5px rgba(192, 192, 192, 0.26);
+    }
+    
+    .quick-menu .item:hover {
+        background-color: rgba(192, 192, 192, 0.089);
+    }
+</style>
+
+<template id="quick_menu_template">
+    <div class="quick-menu simple-panel" v-bind:style="style">
+        <div v-for="item in menu"  v-on:click="item.action(args),style.display = 'none'" class="item tm">
+            [[item.title]]
+        </div>
+    </div>
+</template>
+
+<script>
+    const quickMenuComponent = Vue.component("quick-menu", {
+        template: "#quick_menu_template",
+        delimiters: ['[[', ']]'],
+        props: ['menu'],
+        methods: {
+            show: function(args) {
+                //calculate window limits 
+                var limit_percentage = 0.80
+                var x_limit = (window.innerWidth * limit_percentage)
+                var y_limit = (window.innerHeight * limit_percentage)
+                var x = args.event.clientX
+                var y = args.event.clientY
+
+                if (x > x_limit) {
+                    x = x - 202;
+                }
+
+                if (y > y_limit) {
+                    y = y - (39.2 * this.menu.length)
+                }
+
+                this.style.left = x + "px"
+                this.style.top = y + "px"
+                this.style.display = "block"
+                this.args = args
+            }
+        },
+        data: function() {
+            return {
+                style: {
+                    top: "50px",
+                    left: "100px",
+                    display: "none"
+                },
+                args: null
+            }
+        }
+    })
+</script>

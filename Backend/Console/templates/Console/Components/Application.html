@@ -1,0 +1,114 @@
+<style>
+    .application {
+        display: grid;
+        grid-template-columns: 120px 180px 180px 140px 250px;
+        margin-top: 5px;
+        padding: 20px 10px;
+        border-radius: 4px;
+        background-color: rgba(192, 192, 192, 0.089);
+        transition: all 0.1s ease-out;
+        border: solid 1px rgba(192, 192, 192, 0.377);
+    }
+    
+    .application.editing {
+        transform: scaleX(0.98);
+    }
+    
+    .color-tag {
+        height: 10px;
+        width: 10px;
+        border-radius: 50%;
+        background-color: rgb(238, 119, 119);
+        display: flex;
+        margin-left: 5px;
+    }
+</style>
+
+
+<template id="application_component_template">
+    <div class="application ts" @contextmenu.prevent="quickActions($event)" v-bind:class="{editing:isEditing}" v-bind:title="getSummary" v-on:dblclick="edit">
+        <div class="div-flex start">Color Tag: <div class="color-tag" v-bind:stlye="{backgroundColor: getColor}" v-bind:id="content.id" ></div> </div>
+        <div>Name: [[content.user_defined_name]]</div>
+        <div>Route: /[[content.url_path]]/</div>
+        <div>Health: Online</div>
+        <div>Created: 2022/02/22, 15:34:00</div> 
+    </div>
+</template>
+
+
+<script>
+    const applicationComponent = Vue.component('application-component', {
+        template: "#application_component_template",
+        delimiters: ['[[', ']]'],
+        data: function() {
+            return {
+                isEditing: false
+            }
+        },
+        props: ['content'],
+        computed: {
+            getSummary: function() {
+                return 'Application Summary Not Implented'
+            },
+            getColor: function() {
+                return this.content.color_tag
+            }
+        },
+        methods: {
+            edit: function() {
+                if (this.content.id == -1) {
+                    return
+                }
+
+                this.isEditing = true
+                var parcel = {
+                    data: this.content,
+                    callback: (content) => {
+                        this.isEditing = false
+                        this.content.user_defined_name = content.name
+                        this.content.url_path = content.route
+                        this.content.color_tag = content.color
+                    }
+                }
+                this.$emit('edit', parcel)
+            },
+            quickActions: function(event) {
+                var parcel = {
+                    app: this.content.url_path,
+                    "event": event
+                }
+                this.$emit("quick-menu", parcel)
+            }
+        },
+        mounted: function() {
+            var context = this
+
+            $(`#${context.content.id}`).colorPick({
+                'initialColor': context.content.color_tag,
+                'palette': ["#1abc9c", "#16a085", "#2ecc71", "#27ae60", "#3498db", "#2980b9", "#9b59b6", "#8e44ad", "#34495e", "#2c3e50", "#f1c40f", "#f39c12", "#e67e22", "#d35400", "#e74c3c", "#c0392b", "#ecf0f1"],
+                'onColorSelected': function() {
+                    //update to the server 
+                    var data = {
+                        "color": this.color,
+                        "id": context.content.id
+                    }
+
+                    if (data.id == -1)
+                        return
+
+                    putToServer('/api/applications', data, (result, status) => {
+                        if (status == 204)
+                            alert("Key Error")
+                        if (status == 404)
+                            alert("App Not Found")
+                    })
+
+                    this.element.css({
+                        'backgroundColor': this.color,
+                        'color': this.color
+                    });
+                }
+            });
+        }
+    })
+</script>

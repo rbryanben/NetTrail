@@ -1,0 +1,32 @@
+<style>
+
+</style>
+
+<template id="applications_template"> 
+    <span>
+        <!-- Heading -->
+        <div class="heading">
+            <div class="page">Applications</div>
+            <div class="subpages">
+                <span class="page ts selected">
+                    All
+                </span>
+                <span class="page ts">
+                    Health Checks
+                </span>
+            </div>
+        </div>
+
+        <router-view></router-view>
+    </span>
+</template>
+
+<script>
+    const applicationsPage = Vue.component('applications-page', {
+        template: '#applications_template',
+        delimiters: ['[[', ']]'],
+        mounted: function() {
+
+        },
+    })
+</script>

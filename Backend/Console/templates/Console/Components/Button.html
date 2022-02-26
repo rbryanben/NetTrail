@@ -42,6 +42,7 @@
 
                 this.content.action(() => {
                     this.sendingRequest = false
+                    this.$emit("done")
                 })
             }
         },
@@ -53,6 +54,9 @@
         computed: {
             getSendingRequest: function() {
                 return this.sendingRequest
+            },
+            cancelLoad: function() {
+                this.sendingRequest = false
             }
         },
         props: ["content"]

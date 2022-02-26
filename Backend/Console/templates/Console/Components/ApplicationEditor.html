@@ -1,0 +1,104 @@
+<style>
+    .application-editor {
+        top: 50%;
+        display: none;
+    }
+    
+    .application-editor.show {
+        display: block;
+    }
+    
+    .application-editor .heading_ {
+        padding: 0;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        width: 380px;
+        left: 0;
+    }
+</style>
+
+<template id="application-editor-component-template">
+    <div class="application-editor panel" v-bind:class="{show:isEditing}">
+        <div class="tm heading_">Application Name</div>
+        <div class="input">
+            <input-component v-bind:content="name"></input-component>
+        </div>
+        <div class="tm heading_">Upstream Route</div>
+        <div class="input">
+            <input-component v-bind:content="route"></input-component>
+        </div>
+        <div class="tm heading_">Color Tag</div>
+        <div class="input">
+            <input-component v-bind:content="color"></input-component>
+        </div>
+        <div class="div-flex end heading_" style="margin-bottom: 0;">
+            <button-inapp v-bind:content="updateButton" v-on:done="editDone"></button-inapp>
+        </div> 
+    </div>
+</template>
+
+<script>
+    let applicationEditorComponentData = {
+        name: {
+            placeholder: "Application Name",
+            value: ""
+        },
+        route: {
+            placeholder: "Route",
+            value: ""
+        },
+        color: {
+            placeholder: "#222222",
+            value: ""
+        },
+        updateButton: {
+            text: "Update",
+            action: function(done) {
+                var data = {
+                    "id": applicationEditorComponentData.app_id,
+                    "name": applicationEditorComponentData.name.value,
+                    "color": applicationEditorComponentData.color.value,
+                    "route": applicationEditorComponentData.route.value
+                }
+                putToServer('/api/applications', data, (result, status) => {
+                    if (status == 200) {
+                        done()
+                    } else {
+                        alert("Inernal Server Error")
+                    }
+                })
+            }
+        },
+        isEditing: false,
+        callback: null,
+        app_id: null
+    }
+
+    const applicationEditorComponent = Vue.component('application-editor', {
+        template: "#application-editor-component-template",
+        data: function() {
+            return applicationEditorComponentData
+        },
+        props: ["content"],
+        methods: {
+            edit: function(content) {
+                this.name.value = content.data.user_defined_name
+                this.color.value = content.data.color_tag
+                this.route.value = content.data.url_path
+                this.callback = content.callback
+                this.app_id = content.data.id
+                dimWindow(true)
+                this.isEditing = true
+            },
+            editDone: function() {
+                dimWindow(false)
+                this.isEditing = false
+                this.callback({
+                    'name': applicationEditorComponentData.name.value,
+                    'route': applicationEditorComponentData.route.value,
+                    'color': applicationEditorComponentData.color.value
+                })
+            }
+        }
+    })
+</script>

@@ -1,5 +1,7 @@
-from http import server
-import pickle
+from hashlib import new
+from telnetlib import STATUS
+from urllib.request import Request
+import requests
 import json
 from json.decoder import JSONDecodeError
 import os
@@ -10,7 +12,9 @@ from django.views.decorators.csrf import csrf_exempt
 from .serializers import *
 from .models import *
 from django.utils.datastructures import MultiValueDictKeyError
-
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+channel_layer = get_channel_layer()
 
 """ Get Service Status
 
@@ -97,14 +101,18 @@ def getServers(request):
         except:
             return HttpResponse("Internal Server Error",status=500)
 
-    elif (request.method == "UPDATE"):
+    if (request.method == "UPDATE"):
         try:
             updateKeys = json.loads(request.body)
             server = Server.objects.get(id=updateKeys["server_id"])
             if "color" in updateKeys:
                 server.color_tag = updateKeys["color"]
+
             if "user_defined_name" in updateKeys:
                 server.user_defined_name = updateKeys["user_defined_name"]
+
+            if "ipv4" in updateKeys:
+                server.last_known_ip = updateKeys["ipv4"]
             server.save()
             return HttpResponse("Updated",status=200)
         except MultiValueDictKeyError:
@@ -195,24 +203,13 @@ def getServerLogs(request):
             pass
 
         # Apply filters 
-        server_logs = ServerLog.objects.all()
-
         if server_id:
-            server_logs = server_logs.filter(server_id=server_id)
-        if last_log_id:
-            server_logs = server_logs.filter(id__lte=last_log_id)
+            server_logs = ServerLog.objects.filter(server_id=server_id).order_by("-id")
+        else:
+            server_logs = ServerLog.objects.all().order_by("-id")
+        
         if pending_logs:
-            server_logs = server_logs.filter(id__gte=pending_logs)
-        if src_ip:
-            server_logs = server_logs.filter(src_ip=src_ip)
-        if dest_ip:
-            server_logs = server_logs.filter(dest_ip=dest_ip)
-        if src_mac:
-            server_logs = server_logs.filter(src_mac=src_mac)
-        if dest_mac:
-            server_logs = server_logs.filter(dest_mac=dest_mac)
-        if log_count:
-            server_logs = server_logs.order_by('-id')[:int(log_count)]
+            server_logs = server_logs.filter(id__gte=int(pending_logs) + 1).order_by("id")
 
         serializedLogs = ServerLogSerializer(server_logs,many=True)
         return JsonResponse(serializedLogs.data,safe=False,status=200)
@@ -227,10 +224,12 @@ def getServerLogs(request):
 def receiveServerLogs(request):
     # Test Serialization 
     logs = json.loads(request.body)
+    lastLog = None
     # Store to the database
     for log in logs:
         logToSave = ServerLog()
         logToSave.construct(log["dest_ip"],log["src_ip"],log["protocol"],log["time_local"],log["hostname"],getClientIp(request))
+        lastLog = logToSave
     
     # Return Server Logger Configurations
     try:
@@ -241,6 +240,14 @@ def receiveServerLogs(request):
                 buffer = configurations["server_log_buffer"]
     except:
         buffer = 50
+
+    # Update All Logs Layer
+    async_to_sync(channel_layer.group_send)("group_ServerLogsAll", {
+        "type" : "service_update",
+        "message" : "new_logs",
+        "server" : lastLog.server.id
+    })
+
     return HttpResponse(buffer, status=200)
 
     
@@ -249,3 +256,106 @@ def getClientIp(request):
     if x_forwared_for:
         return x_forwared_for.split(',')[0]
     return request.META.get('REMOTE_ADDR')
+
+
+
+def applicationLogs(request):
+    configurations = None
+    # Write to configuration file 
+    with open("conf\conf.d","r+") as configFile:
+        # Read and load data into a dictionary
+        configurations = json.loads(configFile.read())
+
+    # Get logs and put them into list
+    data = requests.get(f'http://{configurations["gateway_application_ip"]}:1885/app.log')
+    logsSplitted = data.text.split("#")
+    logsSplitted.pop()
+
+    # Create a list of dictionaries
+    logs = []
+
+    #iterate logs
+    for item in logsSplitted:
+        log = json.loads(item)
+
+        # Get Request Tokens
+        referrer = log["request"]
+        referrer_tokens = referrer.split("/")
+        APP_NAME = referrer_tokens[1]
+        
+        # Default Application 
+        APPLICATION = {
+            "name" : "Unassigned",
+            "color" : "silver"
+        }
+
+        # If Application exists set it as the new APPLICATION
+        if (len(Application.objects.filter(url_path=APP_NAME)) > 0):
+            APPLICATION = Application.objects.get(url_path=APP_NAME).toDictionary()
+        
+        # Add the application to the log
+        log['Application'] = APPLICATION
+
+        # Filter out requests from access log
+        if log["request"] != "GET /access.log HTTP/1.1":
+            #check if an application is defined
+            try:
+                application_name = request.GET["Application"]
+                if (log["Application"]["path"] == application_name):
+                    logs.append(log)
+            except MultiValueDictKeyError:
+                logs.append(log)
+            except:
+                pass
+
+    logs.reverse()
+    return HttpResponse(json.dumps(logs))
+
+
+"""
+    Returns or update the applications 
+"""
+@csrf_exempt
+def applications_(request):
+    if request.method == "GET":
+        apps = Application.objects.all()
+        serializedApps = ApplicationSerializer(apps,many=True)
+        return JsonResponse(serializedApps.data,safe=False,status=200)
+
+    if request.method == "PUT":
+        params = json.loads(request.body)
+        app = Application.objects.get(id=params["id"])
+
+        if "color" in params:
+            app.color_tag = params["color"]
+        if 'route' in params:
+            app.url_path = params["route"]
+        if 'name' in params:
+            app.user_defined_name = params["name"]
+    
+        app.save()
+        return HttpResponse(status=200)
+
+    if request.method == "POST":
+        params = json.loads(request.body)
+        #check if an app with that route exists
+        try:
+            app = Application.objects.get(url_path=params["route"])   
+            return HttpResponse("Exists",status=409)
+        except:
+            newApp = Application()
+            newApp.construct(params["color"],params["route"],params["name"])
+            return HttpResponse(status=200)
+
+class ApplicationLog:
+    def __init__(self,path,uid_got,status,time_local,user_agent,ip,remote_user,http_reference,request,body_bytes_sent) -> None:
+        self.path = path
+        self.uid_got = uid_got
+        self.status = status
+        self.time_local = time_local
+        self.user_agent = user_agent
+        self.ip = ip
+        self.remote_user = remote_user
+        self.http_reference = http_reference
+        self.request = request
+        self.body_bytes_sent = body_bytes_sent

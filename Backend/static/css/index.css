@@ -38,6 +38,7 @@ body {
 #Application {
     height: 100vh;
     width: 100vw;
+    overflow: hidden;
 }
 
 .loading-window-wrapper {
@@ -55,4 +56,21 @@ body {
 .loading-window-wrapper.show {
     opacity: 1;
     visibility: 1;
+}
+
+.dim-panel {
+    height: 100vh;
+    width: 100vw;
+    background-color: rgba(0, 0, 0, 0);
+    position: fixed;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+    transition: all 0.3s ease-in;
+    z-index: 101;
+}
+
+.dim-panel.dim {
+    background-color: rgba(0, 0, 0, 0.445);
+    pointer-events: all;
 }

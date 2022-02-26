@@ -4,6 +4,7 @@
         position: relative;
         height: calc(100vh - 124px);
         overflow-y: scroll;
+        background-color: #f3f3f30c;
     }
     
     .allserver-logs-wrapper .loader {
@@ -16,7 +17,21 @@
         color: gray;
         font-family: 'Ubuntu-Light';
         margin-top: 30px;
-        margin-bottom: 30px;
+        margin-bottom: 20px;
+    }
+    
+    .allserver-logs-wrapper .updating {
+        margin-bottom: 10px;
+        padding-top: 20px;
+        display: flex;
+        color: gray;
+        transition: all 0.2s ease-in;
+    }
+    
+    .allserver-logs-wrapper .updating.done {
+        padding-top: 0;
+        visibility: hidden;
+        height: fit-content;
     }
 </style>
 
@@ -24,6 +39,7 @@
     <div class="allserver-logs-wrapper">
         <div class="loader" v-bind:class="{hide:getIsLoading}"></div>
         <div class="header">Log retrival count is set to 1000</div>
+        <div class="updating ts" v-bind:class="{done : getIsUpdating}">Updating Logs...</div>
         <server-log v-for="log in logs" v-bind:content="log"></server-log>
     </div>
 </template>
@@ -35,25 +51,112 @@
         data: function() {
             return {
                 logs: [],
-                isLoading: true
+                isLoading: true,
+                isUpdating: false
             }
         },
         mounted: function() {
-            this.getServerLogs()
+            this.init()
         },
         methods: {
-            getServerLogs: function() {
-                getFromServer("/api/getServerLogs", null, (result, status) => {
+            init: function() {
+                var server_id = this.$route.params.server_id
+                if (server_id == "All") {
+                    this.getAllServerLogs()
+                } else {
+                    this.getServerLogs(server_id)
+                }
+
+                socketCallback = this.updateLogs
+            },
+            getAllServerLogs: function() {
+                // Get Logs
+                getFromServer("/api/getServerLogs?log_count=1000", null, (result, status) => {
                     this.isLoading = false
                     if (status == 200) {
                         this.logs = JSON.parse(result)
                     }
                 })
+            },
+            getServerLogs: function(server_id) {
+                getFromServer(`/api/getServerLogs?server_id=${server_id}`, null, (result, status) => {
+                    this.isLoading = false
+                    if (status == 200) {
+                        this.logs = JSON.parse(result)
+                    }
+                })
+            },
+            updateLogs: function(data) {
+                var server_id = this.$route.params.server_id
+                if (server_id == "All") {
+                    this.isUpdating = true
+                    var context = this
+                    if (this.logs.length > 0) {
+                        getFromServer(`/api/getServerLogs?pending_logs=${this.logs[0].id}`, null, (result, status) => {
+                            if (status == 200) {
+                                JSON.parse(result).forEach(element => {
+                                    this.logs.unshift(element)
+                                });
+                                setTimeout(function() {
+                                    context.isUpdating = false
+                                }, 2000)
+                            }
+                        })
+                    } else {
+                        getFromServer(`/api/getServerLogs`, null, (result, status) => {
+                            if (status == 200) {
+                                JSON.parse(result).forEach(element => {
+                                    this.logs.unshift(element)
+                                });
+                                setTimeout(function() {
+                                    context.isUpdating = false
+                                }, 2000)
+                            }
+                        })
+                    }
+                } else {
+                    if (server_id != data.server)
+                        return
+
+                    this.isUpdating = true
+                    var context = this
+                    if (this.logs.length > 0) {
+                        getFromServer(`/api/getServerLogs?server_id=${data.server}&pending_logs=${this.logs[0].id}`, null, (result, status) => {
+                            if (status == 200) {
+                                JSON.parse(result).forEach(element => {
+                                    this.logs.unshift(element)
+                                });
+                                setTimeout(function() {
+                                    context.isUpdating = false
+                                }, 2000)
+                            }
+                        })
+                    } else {
+                        getFromServer(`/api/getServerLogs`, null, (result, status) => {
+                            if (status == 200) {
+                                JSON.parse(result).forEach(element => {
+                                    this.logs.unshift(element)
+                                });
+                                setTimeout(function() {
+                                    context.isUpdating = false
+                                }, 2000)
+                            }
+                        })
+                    }
+                }
             }
         },
         computed: {
             getIsLoading: function() {
                 return !this.isLoading
+            },
+            getIsUpdating: function() {
+                return !this.isUpdating
+            }
+        },
+        watch: {
+            $route(to, from) {
+                this.init()
             }
         }
     })

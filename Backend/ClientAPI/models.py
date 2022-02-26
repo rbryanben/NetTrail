@@ -61,6 +61,19 @@ class Application(models.Model):
     url_path = models.CharField(max_length=256)
     user_defined_name = models.CharField(max_length=32)
 
+    def toDictionary(self):
+        return {
+            "color" : self.color_tag,
+            "name" : self.user_defined_name,
+            "path" : self.url_path
+        }
+    
+    def construct(self,color_tag,url_path,user_defined_name):
+        self.color_tag = color_tag
+        self.url_path = url_path
+        self.user_defined_name = user_defined_name
+        self.save()
+
 class UserDefinedLog(models.Model):
     failed_message = models.CharField(max_length=256)
     failed_code = models.IntegerField(default=500)
