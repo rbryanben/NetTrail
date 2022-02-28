@@ -10,5 +10,6 @@ urlpatterns = [
     path("getServers",getServers,name="Get Servers"),
     path("getServerLogs",getServerLogs,name="Get Server Logs"),
     path("getApplicationLogs",applicationLogs,name="Application Logs"),
-    path("applications",applications_,name="Applications")
+    path("applications",applications_,name="Applications"),
+    path("getServersOptimised",getServersOptimised,name="Get Servers Optimised"),
 ]

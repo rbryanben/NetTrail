@@ -30,18 +30,24 @@ const routes = [
 
 const routes = [{
         path: "/Console",
-        redirect: "/Console/Network/NetworkServers/Servers/ActiveServers"
+        redirect: "/Console/Dashboard/Context/Trail/Dagger"
     },
     {
         path: "/",
-        redirect: "/Console/Network/NetworkServers/Servers/ActiveServers"
+        redirect: "/Console/Dashboard/Context/Trail/Dagger"
     },
     { path: "/Configure", component: ConfigurationWindow },
-
     {
         path: "/Console/:menu/:sub_menu",
         component: ConsoleWindow,
         children: [{
+                path: "Trail",
+                component: dashBoardComponent,
+                children: [{
+                    path: 'Dagger',
+                    component: dashboardChildComponent
+                }]
+            }, {
                 path: "Logs",
                 component: serverLogsPage,
                 children: [{

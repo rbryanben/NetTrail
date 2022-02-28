@@ -1,0 +1,21 @@
+<template id="dashboard-component-template">
+    <div class="">
+        <!-- Heading -->
+        <div class="heading">
+            <div class="page">Dashboard</div>
+            <div class="subpages">
+                <span class="page ts selected">
+                    Welcome back
+                </span>
+            </div>
+        </div>
+
+        <router-view></router-view>
+    </div>
+</template>
+
+<script>
+    const dashBoardComponent = Vue.component('dashboard-component', {
+        template: '#dashboard-component-template'
+    })
+</script>

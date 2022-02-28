@@ -18,7 +18,7 @@ class ServerLogSerializer(serializers.ModelSerializer):
 class ApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Application
-        fields = ['id','color_tag','url_path','user_defined_name']     
+        fields = ['id','color_tag','url_path','user_defined_name','log_count']     
 
 class UserDefinedLogSerializer(serializers.ModelSerializer):
     application = ApplicationSerializer(many=True)

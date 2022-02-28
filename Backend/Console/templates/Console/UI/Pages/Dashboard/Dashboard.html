@@ -1,0 +1,179 @@
+<style>
+    .dagger-wrapper {
+        padding: 20px;
+        overflow-y: scroll;
+        height: calc(100vh - 120px);
+    }
+    
+    .dagger-wrapper .header {
+        margin-left: 50px;
+        font-size: 2.5rem;
+        margin-top: 30px;
+        font-family: 'Ubuntu-Light';
+        color: gray;
+    }
+    
+    .dagger-wrapper .header.ts {
+        font-size: medium;
+        margin-bottom: 20px;
+    }
+    
+    canvas {
+        width: 100% !important;
+    }
+</style>
+<template id="dashboard-child-template">
+    <div class="dagger-wrapper">
+        <div class="header">Applications</div>
+        <div class="header ts">We have summarized it for you.</div>
+        <div class="">
+            <canvas id="myChart" width="400px" height="400px" style=" width: 400px !important;"></canvas>
+        </div>
+        <div class="header">Servers</div>
+        <div class="header ts">Just were you need them.</div>
+        <div class="">
+            <canvas id="myChartServer" width="400px" height="400px" style=" width: 400px !important;"></canvas>
+        </div>
+    </div>
+</template>
+
+<script>
+    const dashboardChildComponent = Vue.component('dashboard-component-page', {
+        template: "#dashboard-child-template",
+        mounted: function() {
+            this.init()
+            this.initServerChart()
+        },
+        methods: {
+            init: () => {
+
+                getFromServer('/api/applications', null, (result, status) => {
+                    if (status == 200) {
+                        let labels = []
+                        let colors = []
+                        let logs = []
+                        let Apps = JSON.parse(result)
+                        Apps.forEach(element => {
+                            labels.push(element.user_defined_name)
+                            colors.push(element.color_tag)
+                            logs.push(element.log_count)
+                        });
+
+                        const data = {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Application Logs',
+                                backgroundColor: colors,
+                                borderColor: colors,
+                                data: logs,
+                            }, {
+                                label: "Visualizer",
+                                //new option, type will default to bar as that what is used to create the scale
+                                type: "line",
+                                fillColor: "rgb(29, 95, 32)",
+                                strokeColor: "rgb(29, 95, 32)",
+                                pointColor: "rgb(29, 95, 32)",
+                                pointStrokeColor: "rgb(29, 95, 32)",
+                                pointHighlightFill: "rgb(29, 95, 32)",
+                                pointHighlightStroke: "rgb(29, 95, 32)",
+                                data: logs
+                            }]
+                        };
+
+                        const config = {
+                            type: 'bar',
+                            data: data,
+                            options: {
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                },
+                                maxBarThickness: 80,
+                                responsive: true,
+                                maintainAspectRatio: false,
+                            },
+                        };
+
+                        const ctx2 = document.getElementById('myChart');
+                        const myChart = new Chart(
+                            ctx2,
+                            config
+                        );
+
+                        let ctxOnClick_ = function(click) {
+                            const points = myChart.getElementsAtEventForMode(click, 'nearest', {
+                                intersect: true
+                            }, true)
+                            var bar = points[0].index
+                            router.push('/Console/Applications/ApplicationLogs/AppLogs/AllLogs/Application/' + Apps[bar].url_path)
+                        }
+                        ctx2.onclick = ctxOnClick_
+                    }
+                })
+
+
+            },
+            initServerChart() {
+
+                getFromServer('/api/getServers', null, (result, status) => {
+                    if (status == 200) {
+                        let servers = JSON.parse(result)
+
+                        //labels 
+                        let labels = []
+                        let colors = []
+                        let logs = []
+                        servers.forEach(element => {
+                            labels.push(element.hostname)
+                            colors.push(element.color_tag)
+                            logs.push(element.log_count)
+                        });
+
+                        const data = {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Server Logs',
+                                backgroundColor: colors,
+                                borderColor: colors,
+                                data: logs,
+                            }]
+                        };
+
+                        const config = {
+                            type: 'bar',
+                            data: data,
+                            options: {
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                },
+                                maxBarThickness: 80,
+                                responsive: true,
+                                maintainAspectRatio: false,
+                            },
+                        };
+
+
+                        const ctx = document.getElementById('myChartServer');
+                        const myChart = new Chart(
+                            ctx,
+                            config
+                        );
+
+                        let ctxOnClick = function(click) {
+                            const points = myChart.getElementsAtEventForMode(click, 'nearest', {
+                                intersect: true
+                            }, true)
+                            var bar = points[0].index
+                            router.push('/Console/Network/NetworkServerLogs/Logs/AllLogs/Server/' + servers[bar].id)
+                        }
+                        ctx.onclick = ctxOnClick
+                    }
+                })
+
+            }
+        }
+    })
+</script>

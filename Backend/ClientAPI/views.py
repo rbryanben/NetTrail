@@ -13,7 +13,9 @@ from .serializers import *
 from .models import *
 from django.utils.datastructures import MultiValueDictKeyError
 from asgiref.sync import async_to_sync
+from django.core import serializers
 from channels.layers import get_channel_layer
+from .models import TCPLog
 channel_layer = get_channel_layer()
 
 """ Get Service Status
@@ -120,6 +122,12 @@ def getServers(request):
         except Server.DoesNotExist:
             return HttpResponse("Invalid Server Identification",status=404)
 
+
+def getServersOptimised(request):
+    servers = Server.objects.all()
+    serversSerialized = serializers.serialize("json",servers)
+    return HttpResponse(serversSerialized,status=200)
+    
 """
     Get Server Logs 
 
@@ -137,15 +145,7 @@ def getServerLogs(request):
     if (request.method == "GET"):
         # Filters
         server_id = None
-        last_log_id = None
         pending_logs = None
-        start_time = None
-        src_ip = None
-        dest_ip = None
-        src_mac = None
-        dest_mac = None
-        log_count = None
-
         keySet = request.GET
 
         ## Server id key
@@ -154,11 +154,6 @@ def getServerLogs(request):
         except:
             pass
 
-        ## last_log_id 
-        try:
-            last_log_id = keySet["last_log_id"]
-        except:
-            pass
 
         ## pending logs
         try:
@@ -166,41 +161,6 @@ def getServerLogs(request):
         except:
             pass
 
-        ## start time 
-        try:
-            start_time = keySet["start_time"]
-        except:
-            pass
-            
-        ## src_ip
-        try:
-            src_ip = keySet["src_ip"]
-        except:
-            pass
-
-        ## dest_ip
-        try:
-            dest_ip = keySet["dest_ip"]
-        except:
-            pass
-
-        ## src_mac
-        try:
-            src_mac = keySet["src_mac"]
-        except:
-            pass
-
-        ## dest mac
-        try:
-            dest_mac = keySet["dest_mac"]
-        except:
-            pass
-
-        ## log count 
-        try:
-            log_count = keySet["log_count"]
-        except:
-            pass
 
         # Apply filters 
         if server_id:
@@ -211,8 +171,8 @@ def getServerLogs(request):
         if pending_logs:
             server_logs = server_logs.filter(id__gte=int(pending_logs) + 1).order_by("id")
 
-        serializedLogs = ServerLogSerializer(server_logs,many=True)
-        return JsonResponse(serializedLogs.data,safe=False,status=200)
+        serializedLogs =serializers.serialize("json",server_logs,use_natural_foreign_keys=True,use_natural_primary_keys=True)
+        return HttpResponse(serializedLogs,status=200)
 
 
 """
@@ -260,6 +220,7 @@ def getClientIp(request):
 
 
 def applicationLogs(request):
+    TCPLog.objects.all().delete()
     configurations = None
     # Write to configuration file 
     with open("conf\conf.d","r+") as configFile:
@@ -295,6 +256,13 @@ def applicationLogs(request):
         
         # Add the application to the log
         log['Application'] = APPLICATION
+
+        # Add to the database
+        new_record = TCPLog()
+
+        new_record = new_record.construct(log["Application"]["path"],"Some UID",log["status"],log["time_local"],"User Agent"
+            ,log["remote_addr"],log["remote_addr"],"None",log["request"],log["body_bytes_sent"])
+ 
 
         # Filter out requests from access log
         if log["request"] != "GET /access.log HTTP/1.1":

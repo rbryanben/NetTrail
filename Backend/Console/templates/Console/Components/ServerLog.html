@@ -13,11 +13,11 @@
 
 <template id="server_log_component_template">
     <div class="server-log ts" v-bind:title="getSummary">
-        <div>Server: [[content.server.hostname]]</div>
-        <div>Source: [[content.src_ip]]</div>
-        <div>Destination: [[content.dest_ip]]</div>
-        <div>Protocol: [[content.protocol]]</div>
-        <div>Local Time: [[content.time_local]]</div>
+        <div>Server: [[content.fields.server]] </div>
+        <div>Source: [[content.fields.src_ip]]</div>
+        <div>Destination: [[content.fields.dest_ip]]</div>
+        <div>Protocol: [[content.fields.protocol]]</div>
+        <div>Local Time: [[content.fields.time_local]]</div>
         <div>Logs Received: 2022-02-19 10:52:45</div>
     </div>
 </template>
@@ -26,10 +26,10 @@
     const serverLogComponent = Vue.component('server-log', {
         template: "#server_log_component_template",
         delimiters: ['[[', ']]'],
-        props: ['content'],
+        props: ['content', 'servers'],
         computed: {
             getSummary: function() {
-                return ` Log from ${this.content.server.hostname} captured ${this.content.time_local}.${this.content.protocol} packet sent from ${this.content.src_ip} to ${this.content.dest_ip} `
+                return ` Log from ${this.content.fields.server.hostname} captured ${this.content.fields.time_local}.${this.content.fields.protocol} packet sent from ${this.content.fields.src_ip} to ${this.content.fields.dest_ip} `
             }
         }
     })

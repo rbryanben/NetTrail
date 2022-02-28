@@ -40,7 +40,7 @@
         <div class="loader" v-bind:class="{hide:getIsLoading}"></div>
         <div class="header">Log retrival count is set to 1000</div>
         <div class="updating ts" v-bind:class="{done : getIsUpdating}">Updating Logs...</div>
-        <server-log v-for="log in logs" v-bind:content="log"></server-log>
+        <server-log v-for="log in logs" v-bind:content="log" :key="log.fields.id"></server-log>
     </div>
 </template>
 
@@ -61,6 +61,7 @@
         methods: {
             init: function() {
                 var server_id = this.$route.params.server_id
+
                 if (server_id == "All") {
                     this.getAllServerLogs()
                 } else {
@@ -70,6 +71,7 @@
                 socketCallback = this.updateLogs
             },
             getAllServerLogs: function() {
+
                 // Get Logs
                 getFromServer("/api/getServerLogs?log_count=1000", null, (result, status) => {
                     this.isLoading = false

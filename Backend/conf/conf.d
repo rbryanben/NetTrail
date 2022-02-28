@@ -1,1 +1,1 @@
-{"gateway_application_ip": "192.168.172.236", "log_retrival_count": 1000, "server_log_buffer": 20}
+{"gateway_application_ip": "127.0.0.1", "log_retrival_count": 1000, "server_log_buffer": 20}

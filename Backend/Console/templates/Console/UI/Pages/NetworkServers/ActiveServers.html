@@ -27,7 +27,7 @@
         <quick-menu v-bind:menu="quickMenuOptions" ref="quick_menu"></quick-menu>
         <div class="header">List of active network servers</div>
         <network-server-editor ref="networkServerEditor" ></network-server-editor>
-        <network-server v-on:quick-menu="showQuickMenu($event)" v-for="server in servers" v-on:edit="editServer($event)" v-bind:content="server"></network-server>
+        <network-server v-on:quick-menu="showQuickMenu($event)" v-for="server in servers" :key="server.id" v-on:edit="editServer($event)" v-bind:content="server"></network-server>
     </div>
 </template>
 

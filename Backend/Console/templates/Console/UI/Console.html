@@ -64,6 +64,24 @@
         data: function() {
             return {
                 menu: {
+                    dashboard: {
+                        subMenu: [{
+                            route: "Context",
+                            text: "Trail Dagger",
+                            redirect: "/Console/Dashboard/Context/Trail/Dagger"
+                        }, {
+                            route: "Applications",
+                            text: "Applications (📌)",
+                            redirect: "/Console/Applications/Applications/Apps/All"
+                        }, {
+                            route: "NetworkServers",
+                            text: "Network Servers (📌)",
+                            redirect: "/Console/Network/NetworkServers/Servers/ActiveServers"
+                        }],
+                        icon: "fa-solid fa-table-columns",
+                        route: "Dashboard",
+                        redirect: "/Console/Dashboard/Context/Trail/Dagger"
+                    },
                     network: {
                         subMenu: [{
                             route: "NetworkServers",
@@ -104,6 +122,7 @@
                         icon: "fa-solid fa-gear",
                         route: "/Console/Settings/All"
                     }
+
                 }
 
             }
@@ -124,6 +143,8 @@
                         return this.menu.network
                     case "Applications":
                         return this.menu.applications
+                    case "Dashboard":
+                        return this.menu.dashboard
                     default:
                         return []
                 }

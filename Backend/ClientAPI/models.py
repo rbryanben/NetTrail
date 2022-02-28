@@ -1,5 +1,9 @@
+import imp
 import random
 from django.db import models
+import json
+import requests
+from django.utils.datastructures import MultiValueDictKeyError
 
 
 """
@@ -21,6 +25,9 @@ class Server(models.Model):
         self.color_tag = getRandomColor()
         self.hostname = hostname
         self.save()
+    
+    def natural_key(self):
+        return (self.user_defined_name)
 
     @property
     def log_count(self):
@@ -37,7 +44,9 @@ class ServerLog(models.Model):
     time_received = models.DateTimeField(auto_now=True)
     server = models.ForeignKey(Server,on_delete=models.CASCADE)
     
-
+    @property
+    def server_name(self):
+        return self.server.user_defined_name
 
     def construct(self,dest_ip,src_ip, protocol, time_local, server_hostname, host_ip):
         self.dest_ip = dest_ip
@@ -74,6 +83,11 @@ class Application(models.Model):
         self.user_defined_name = user_defined_name
         self.save()
 
+    @property
+    def log_count(self):
+        return TCPLog.objects.filter(path=self.url_path).count
+          
+
 class UserDefinedLog(models.Model):
     failed_message = models.CharField(max_length=256)
     failed_code = models.IntegerField(default=500)
@@ -93,5 +107,18 @@ class TCPLog(models.Model):
     ip = models.CharField(max_length=15)
     remote_user = models.CharField(max_length=64)
     http_reference = models.CharField(max_length=64)
-    request = models.CharField(max_length=64)
+    request = models.CharField(max_length=128)
     body_bytes_sent = models.BigIntegerField()
+
+    def construct(self,path,uid_got,status,time_local,user_agent,ip,remote_user,http_reference,request,body_bytes_sent):
+        self.path = path
+        self.uid_got = uid_got
+        self.status = status
+        self.time_local = time_local
+        self.user_agent = user_agent
+        self.ip = ip
+        self.remote_user = remote_user
+        self.http_reference = http_reference
+        self.request = request
+        self.body_bytes_sent = body_bytes_sent
+        self.save()
