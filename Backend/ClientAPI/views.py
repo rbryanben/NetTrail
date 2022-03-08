@@ -220,7 +220,6 @@ def getClientIp(request):
 
 
 def applicationLogs(request):
-    TCPLog.objects.all().delete()
     configurations = None
     # Write to configuration file 
     with open("conf\conf.d","r+") as configFile:
@@ -257,12 +256,6 @@ def applicationLogs(request):
         # Add the application to the log
         log['Application'] = APPLICATION
 
-        # Add to the database
-        new_record = TCPLog()
-
-        new_record = new_record.construct(log["Application"]["path"],"Some UID",log["status"],log["time_local"],"User Agent"
-            ,log["remote_addr"],log["remote_addr"],"None",log["request"],log["body_bytes_sent"])
- 
 
         # Filter out requests from access log
         if log["request"] != "GET /access.log HTTP/1.1":
