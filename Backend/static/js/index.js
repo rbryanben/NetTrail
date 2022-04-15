@@ -30,11 +30,11 @@ const routes = [
 
 const routes = [{
         path: "/Console",
-        redirect: "/Console/Dashboard/Context/Trail/Dagger"
+        redirect: "/Console/Network/NetworkServers/Servers/ActiveServers"
     },
     {
         path: "/",
-        redirect: "/Console/Dashboard/Context/Trail/Dagger"
+        redirect: "/Console/Network/NetworkServers/Servers/ActiveServers"
     },
     { path: "/Configure", component: ConfigurationWindow },
     {
@@ -81,6 +81,10 @@ const routes = [{
         ]
     }
 ]
+
+Vue.use(VueVirtualScroller)
+
+Vue.component('recyclescroller', VueVirtualScroller.RecycleScroller)
 
 const router = new VueRouter({
     routes

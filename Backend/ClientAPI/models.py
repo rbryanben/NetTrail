@@ -62,6 +62,10 @@ class ServerLog(models.Model):
             new_server = Server()
             new_server.construct(host_ip,server_hostname)
             self.server = new_server
+        
+        #Update last known ip
+        self.server.last_known_ip = host_ip
+        self.server.save()
 
         self.save()
 

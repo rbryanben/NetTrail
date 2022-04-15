@@ -88,18 +88,12 @@ WSGI_APPLICATION = 'Backend.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-
     'default': {
-        'ENGINE' : 'mssql',
-        'NAME' : 'NetTrail',
-        'HOST': 'DESKTOP-J8F2F6F',
-        'USER' : 'NetTrail',
-        'PASSWORD' : 'password25',
-        'PORT' : '',
-        'OPTIONS' : {"driver" : "ODBC Driver 17 for SQL Server"}
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
-    
 }
+    
 
 
 # Password validation

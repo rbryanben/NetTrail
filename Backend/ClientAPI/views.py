@@ -161,16 +161,15 @@ def getServerLogs(request):
         except:
             pass
 
+        print("Called To Collect")
 
         # Apply filters 
         if server_id:
-            server_logs = ServerLog.objects.filter(server_id=server_id).order_by("-id")
+            server_logs = ServerLog.objects.filter(server_id=server_id).order_by("-id")[:5000]
         else:
-            server_logs = ServerLog.objects.all().order_by("-id")
-        
+            server_logs = ServerLog.objects.all().order_by("-id")[:5000]
         if pending_logs:
             server_logs = server_logs.filter(id__gte=int(pending_logs) + 1).order_by("id")
-
         serializedLogs =serializers.serialize("json",server_logs,use_natural_foreign_keys=True,use_natural_primary_keys=True)
         return HttpResponse(serializedLogs,status=200)
 
@@ -185,10 +184,11 @@ def receiveServerLogs(request):
     # Test Serialization 
     logs = json.loads(request.body)
     lastLog = None
+    remote_ip = getClientIp(request)
     # Store to the database
     for log in logs:
         logToSave = ServerLog()
-        logToSave.construct(log["dest_ip"],log["src_ip"],log["protocol"],log["time_local"],log["hostname"],getClientIp(request))
+        logToSave.construct(log["dest_ip"],log["src_ip"],log["protocol"],log["time_local"],log["hostname"],remote_ip)
         lastLog = logToSave
     
     # Return Server Logger Configurations
@@ -212,7 +212,7 @@ def receiveServerLogs(request):
 
     
 def getClientIp(request):
-    x_forwared_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    x_forwared_for = request.META.get('HTTP_X_REAL_IP')
     if x_forwared_for:
         return x_forwared_for.split(',')[0]
     return request.META.get('REMOTE_ADDR')

@@ -36,11 +36,11 @@
 </style>
 
 <template id="all_server_logs_template"> 
-    <div class="allserver-logs-wrapper">
+    <div class="allserver-logs-wrapper" @scroll="onScroll">
         <div class="loader" v-bind:class="{hide:getIsLoading}"></div>
         <div class="header">Log retrival count is set to 1000</div>
         <div class="updating ts" v-bind:class="{done : getIsUpdating}">Updating Logs...</div>
-        <server-log v-for="log in logs" v-bind:content="log" :key="log.fields.id"></server-log>
+        <server-log v-for="log in logs" v-bind:content="log" :key="log.id"></server-log>
     </div>
 </template>
 
@@ -51,8 +51,10 @@
         data: function() {
             return {
                 logs: [],
+                allLogs: [],
                 isLoading: true,
-                isUpdating: false
+                isUpdating: false,
+                currentLimit: null,
             }
         },
         mounted: function() {
@@ -70,13 +72,27 @@
 
                 socketCallback = this.updateLogs
             },
+            onScroll({
+                target: {
+                    scrollTop,
+                    clientHeight,
+                    scrollHeight
+                }
+            }) {
+                if (scrollTop + clientHeight >= scrollHeight) {
+                    //add 100 at the bottom and remove 100 at the top 
+                    this.logs = this.logs.concat(this.allLogs.splice(this.currentLimit, this.currentLimit + 200))
+                    this.currentLimit += 200;
+                }
+            },
             getAllServerLogs: function() {
-
                 // Get Logs
                 getFromServer("/api/getServerLogs?log_count=1000", null, (result, status) => {
                     this.isLoading = false
                     if (status == 200) {
-                        this.logs = JSON.parse(result)
+                        this.allLogs = JSON.parse(result)
+                        this.logs = this.allLogs.splice(0, 200)
+                        this.currentLimit = 200
                     }
                 })
             },
